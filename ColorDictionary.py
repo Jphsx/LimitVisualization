@@ -42,9 +42,16 @@ JetGrad={
 '0J2J':11*j_grad_step#debug
 }
 
+LepOnly={
+'0L': 1e-6,
+'1L': 0.34,
+'2L':0.64,
+'3L':1.
+}
+
 def createLepColorMatrix():
 	
-	Colors = [[0, 242,36],[0, 242,226],[0, 28,242],[242,0,218]]
+	Colors = [[0, 255,0],[0, 255,255],[0, 0,255],[255,0,255]]
 	Red=[]
 	Green=[]
 	Blue=[]
@@ -138,7 +145,7 @@ def drawLepTestScale(RGBL):
 
 
 	Number = 4  
-	nb=300
+	nb=500
 	#np.array([1, 2, 3], dtype=complex)
 	#rt.TColor.CreateGradientColorTable(Number,RGBL[3],RGBL[0],RGBL[1],RGBL[2],nb)
 	rt.TColor.CreateGradientColorTable(Number,np.array(RGBL[3],dtype=np.double),
@@ -146,25 +153,25 @@ def drawLepTestScale(RGBL):
 	np.array(RGBL[1],dtype=np.double),
 	np.array(RGBL[2],dtype=np.double),
 	nb)
-	nbinx=11
-	nbiny=10
+	nbinx=50
+	nbiny=50
 	h2 = rt.TH2D("testScale","Test Color Scale", nbinx, 0,1,nbiny,0, 1)
 	h2.SetMaximum(1.0)
 	h2.SetMinimum(0.0)
 	h2.SetContour(nb)
 	 
-	njet_label = ["0jS"," ","1jS"," ","2jS"," ","3jS"," ","4jS"," ","5jS"]
-	nlep_label = ["0L"," "," ","1L"," "," ","2L"," "," ","3L"]
-	for x in range(1,nbinx+1):
-		h2.GetXaxis().SetBinLabel(x,njet_label[x-1])
+	#njet_label = ["0jS"," ","1jS"," ","2jS"," ","3jS"," ","4jS"," ","5jS"]
+	#nlep_label = ["0L"," "," ","1L"," "," ","2L"," "," ","3L"]
+	#for x in range(1,nbinx+1):
+	#	h2.GetXaxis().SetBinLabel(x,njet_label[x-1])
 	 
-	for y in range(1,nbiny+1):
-		h2.GetYaxis().SetBinLabel(y,nlep_label[y-1])	
+	#for y in range(1,nbiny+1):
+#		h2.GetYaxis().SetBinLabel(y,nlep_label[y-1])	
 	
-	 
+	TotBin=nbinx*nbiny
 	 
 	grad=0.000001
-	grad_step=(0.1/11.)
+	grad_step=(1./TotBin)
 	for y in range(1,nbiny+1):
 		for x in range(1,nbinx+1):
 			h2.SetBinContent(x,y,grad)

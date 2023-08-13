@@ -136,6 +136,31 @@ def evaluateLeptonContribution(keytuple, gpdict):
 	
 	#print(chkey)
 	return chkey
+
+def evaluateLeptonOnlyContribution(keytuple, gpdict):
+	Ch0L=0.
+	Ch1L=0.
+	Ch2L=0.
+	Ch3L=0.
+	for key in gpdict[keytuple]:
+		if( gpdict[keytuple][key][3] <= 0):
+			if "Ch0L" in key:
+				Ch0L = Ch0L+gpdict[keytuple][key][5]
+			if "Ch1L" in key:
+				Ch1L = Ch1L+gpdict[keytuple][key][5]
+			if "Ch2L" in key:
+				Ch2L = Ch2L+gpdict[keytuple][key][5]
+			if "Ch3L" in key:
+				Ch3L = Ch3L+gpdict[keytuple][key][5]
+	print("Lepton Channel Fractional Contribution (%)")
+	print( "	0L:",round(Ch0L*100.,1), "  1L:",round(Ch1L*100.,1),"  2L:",round(Ch2L*100.,1),"  3L:",round(Ch3L*100.,1))
+	
+	chL = { '0L':Ch0L, '1L':Ch1L, '2L':Ch2L, '3L':Ch3L }
+	chsorted = {k: v for k, v in sorted(chL.items(), key=lambda item: item[1], reverse=True)}
+	
+	
+	#print(chkey)
+	return chL
 	
 def evaluateJetContribution(keytuple, gpdict):
 	Ch0jS=0.
@@ -199,6 +224,41 @@ def getColorMap(keytuple, gpdict):
 	
 	return L+J	
 	
+def getLepOnlyColorMap(keytuple, gpdict):
+	DX=0
+	for key in gpdict[keytuple]:
+		if gpdict[keytuple][key][3] <= 0.:
+			DX = DX + gpdict[keytuple][key][3]
+	for key in gpdict[keytuple]:
+		#append weight to each sublimit
+		gpdict[keytuple][key].append( gpdict[keytuple][key][3]/DX )
+
+	#L is a dict here not a a string key
+	L=evaluateLeptonOnlyContribution(keytuple, gpdict)
+	#print("cmap",L)
+	#get max
+	primary=0
+	secondary=0
+	primary_key=''
+	secondary_key=''
+	for key in L:
+		if L[key] >= primary:
+			primary = L[key]
+			primary_key = key
+			
+	for key in L:
+		if ( L[key] < primary ) and ( L[key] >= secondary ):
+			secondary = L[key]
+			secondary_key = key
+	
+	#create a weighted color average of primary and secondary
+	wp = L[primary_key] 
+	ws = L[secondary_key]
+	Col1 = CD.LepOnly[primary_key]
+	Col2 = CD.LepOnly[secondary_key]
+	color = (wp*Col1 + ws*Col2)/(wp+ws)
+	#print(color)
+	return color
 		
 	
 def DEBUG():
@@ -215,6 +275,19 @@ def DEBUG():
 		evaluatePointKey(key,gpd)
 		getColorMap(key,gpd)
 
+def DEBUG2():
+	wildcard = "test_files/single_3000270/higgsCombine.*.AsymptoticLimits.mH3000270.root"
+	files = getListOfFilesWC(wildcard)
+	lim = getLimitFromFile(files[0])
+	mass = getMassesFromFilename(files[0])
+	#print(files[0])
+	#print(mass,lim)
+	#print(evaluatePointFromWildCard(wildcard))
+	gpd = createLimitPointDict(wildcard)
+	#print(gpd)
+	for key in gpd:
+		evaluatePointKey(key,gpd)
+		getLepOnlyColorMap(key,gpd)
 
 
  
