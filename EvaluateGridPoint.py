@@ -253,7 +253,7 @@ def getLepOnlyColorMap(keytuple, gpdict):
 	
 	#create a weighted color average of primary and secondary
 	wp = L[primary_key] 
-	ws = L[secondary_key]
+	ws = L[secondary_key]*3
 	Col1 = CD.LepOnly[primary_key]
 	Col2 = CD.LepOnly[secondary_key]
 	color = (wp*Col1 + ws*Col2)/(wp+ws)
