@@ -63,13 +63,13 @@ def smoothMatrix(matrix):
 
 
 
-
-matrix = np.array([[1,0,0,0,2],
+def DEBUG():
+	matrix = np.array([[1,0,0,0,2],
 		   [0,0,0,0,0],
 		   [0,0,0,0,0],
 		   [0,0,0,0,0],
 		   [0,0,0,0,0],
 		   [3,0,0,0,4]] , dtype=np.float32)
-print(matrix)	
-new_matrix = smoothMatrix(matrix)
-print(new_matrix)
+	print(matrix)	
+	new_matrix = smoothMatrix(matrix)
+	print(new_matrix)

@@ -4,7 +4,7 @@
 
 import EvaluateGrid as EG
 import numpy as np
-
+import ColorSmoothing as CS
 
 def getNearestEdge( edgeList, value):
 	diff = 999
@@ -71,15 +71,71 @@ def translateToCustomdMGrid( gpcolord, dMedges, NLSPedges):
 	print(npgrid)
 	return npgrid
 
+def pad2by2(npads, submatrix):
+	zeromat = np.zeros((npads+2,npads+2))
+	#print(zeromat)
+	zeromat[0][0] = submatrix[0][0]
+	zeromat[0][npads+1] = submatrix[0][1]
+	zeromat[npads+1][0] = submatrix[1][0]
+	zeromat[npads+1][npads+1] = submatrix[1][1]
+	#print(zeromat)
+	return(zeromat)
+	
+def reformulateSuperMatrix( super_rows ):
+	#merge each "row" column stacking
+	firstmat=True
+
+	for  row_idx , super_row in enumerate(super_rows):
+		for submat_idx, submat in enumerate(super_row):
+			if firstmat==False :
+				super_rows[row_idx][submat_idx]= submat[:,1:]
+			else:
+				do_nothing=1	#do nothing
+			firstmat=False
+		firstmat=True
+		
+	for row_idx, super_row in enumerate(super_rows):
+		super_rows[row_idx] = np.concatenate(super_row, axis=1)
+		
+	firstmat=True
+	for row_idx, submat in enumerate(super_rows):
+		if firstmat==False :
+			super_rows[row_idx] = submat[1:,:]
+		else:
+			do_nothing=1
+		firstmat=False
+		
+	super_rows = np.concatenate(super_rows, axis=0)
+	
+	print("reformulated merge rows")
+	for row in super_rows:
+		print(row)
+		print()
+	return(super_rows)
+
 def padAndSmoothMatrix(npgrid):
 	num_rows,num_cols = npgrid.shape
 	#step over numrows or cols -1
 	#prepare sub matrices
+	super_rows = []
+	
 	for row in range(num_rows-1):
+		super_row = []
 		for col in range(num_cols-1):
 			submat = np.array( [npgrid[row][col:col+2], npgrid[row+1][col:col+2] ] )
-			print(submat)
-
+			#print(submat)
+			padmat = pad2by2(1,submat)
+			#smooth padded mat
+			#print(padmat)
+			smoothmat = CS.smoothMatrix(padmat)
+			#print(smoothmat)
+			super_row.append(smoothmat)
+		super_rows.append(super_row)
+	#print(super_rows)
+	#for rows in super_rows:
+	#	print(rows)
+	#	print()
+	new_matrix = reformulateSuperMatrix( super_rows)
 
 def DEBUG():
 	gridpath="test_files/full_grid_TChiWZ"
